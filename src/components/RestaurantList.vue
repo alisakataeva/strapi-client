@@ -11,24 +11,24 @@
             <v-row>
               <v-col v-for="(r, ix) in restaurantList" :key="ix">
                 <v-card
-                  @click="selectRestaurant(r)"
+                  @click="selectedRestaurant=r"
                   class="mx-auto"
                   width="250"
                   hover
                 >
                   <v-card-item>
                     <v-card-title>
-                      {{ r.attributes.Name }}
+                      {{ r.name }}
                     </v-card-title>
                     <v-card-subtitle>
-                      Steak, Salad bar
+                      {{ r.categories }}
                     </v-card-subtitle>
                   </v-card-item>
 
                   <v-card-text>
                     <img
-                      v-if="r.attributes.Image.data"
-                      :src="`https://necessary-friend-0f1cdb2c9b.strapiapp.com${r.attributes.Image.data.attributes.formats.thumbnail.url}`" alt=""
+                      v-if="r.image.data"
+                      :src="`${r.image.data.attributes.formats.thumbnail.url}`" alt=""
                     />
                   </v-card-text>
                 </v-card>
@@ -47,10 +47,11 @@
         <template v-if="selectedRestaurant.id">
           <RestaurantDetail
             :id="selectedRestaurant.id"
-            :title="selectedRestaurant.title"
+            :name="selectedRestaurant.name"
             :description="selectedRestaurant.description"
             :rate="selectedRestaurant.rate"
             :image="selectedRestaurant.image"
+            :categories="selectedRestaurant.categories"
             @success="deleteSuccess"
           />
         </template>
@@ -107,20 +108,34 @@
         const response = await client.getRestaurants(this.page, this.pageSize);
         const jsonResponse = await response.json()
         const { meta, data } = jsonResponse;
-        this.restaurantList = data;
+
+        this.restaurantList = [];
+        for (let i = 0; i < data.length; i++) {
+          this.restaurantList.push(this.formatRestaurant(data[i]));
+        }
+
         const { page, pageSize, pageCount } = meta.pagination;
         this.page = page;
         this.pageSize = pageSize;
         this.pageCount = pageCount;
       },
 
-      selectRestaurant(r) {
-        this.selectedRestaurant = {
+      getCategories(r) {
+        if (r.attributes.categories && r.attributes.categories.data !== null) {
+          let arr = r.attributes.categories.data.map(cat => cat.attributes.Name);
+          return arr.join(", ");
+        }
+        return null
+      },
+
+      formatRestaurant(r) {
+        return {
           id: r.id,
-          title: r.attributes.Name,
+          name: r.attributes.Name,
           description: r.attributes.Description,
           rate: r.attributes.Rating,
           image: r.attributes.Image,
+          categories: this.getCategories(r),
         }
       },
 

@@ -2,15 +2,15 @@
   <v-card max-width="800">
     <v-img
       v-if="imageUrl"
-      :src="`https://necessary-friend-0f1cdb2c9b.strapiapp.com${imageUrl}`" alt=""
+      :src="`${imageUrl}`" alt=""
       cover
     ></v-img>
     <v-card-title class="mt-4">
-      <h1>{{ title }}</h1>
+      <h1>{{ name }}</h1>
       <strong>Rating: {{ rate }}</strong>
     </v-card-title>
     <v-card-subtitle>
-      Steak, Salad bar
+      {{ categories }}
     </v-card-subtitle>
     <v-divider></v-divider>
     <v-card-text>
@@ -36,10 +36,11 @@
 
     props: {
       id: Number,
-      title: String,
+      name: String,
       description: String,
       rate: Number,
-      image: String,
+      image: Object,
+      categories: Object,
     },
 
     computed: {

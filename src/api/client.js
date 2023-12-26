@@ -40,7 +40,6 @@ class RestAPI {
     }
 
     getRestaurants = (page, pageSize) => {
-        console.log(page, pageSize)
         return this.get(`/restaurants?pagination[page]=${page}&pagination[pageSize]=${pageSize}&populate=*`)
     }
 
